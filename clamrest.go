@@ -120,6 +120,7 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		s := <-response
+
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 		respJson, err := json.Marshal(&s)
