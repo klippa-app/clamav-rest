@@ -119,31 +119,30 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		for s := range response {
-			w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		s := <-response
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-			respJson, err := json.Marshal(&s)
-			if err != nil {
-				writeError(w, http.StatusInternalServerError, "Could not marshal JSON: "+err.Error())
-				return
-			}
-
-			switch s.Status {
-			case clamd.RES_OK:
-				w.WriteHeader(http.StatusOK)
-			case clamd.RES_FOUND:
-				w.WriteHeader(http.StatusNotAcceptable)
-			case clamd.RES_ERROR:
-				w.WriteHeader(http.StatusBadRequest)
-			case clamd.RES_PARSE_ERROR:
-				w.WriteHeader(http.StatusPreconditionFailed)
-			default:
-				w.WriteHeader(http.StatusNotImplemented)
-			}
-
-			fmt.Fprint(w, string(respJson))
-			fmt.Printf(time.Now().Format(time.RFC3339)+" Scan result for: %v, %v\n", part.FileName(), s)
+		respJson, err := json.Marshal(&s)
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, "Could not marshal JSON: "+err.Error())
+			return
 		}
+
+		switch s.Status {
+		case clamd.RES_OK:
+			w.WriteHeader(http.StatusOK)
+		case clamd.RES_FOUND:
+			w.WriteHeader(http.StatusNotAcceptable)
+		case clamd.RES_ERROR:
+			w.WriteHeader(http.StatusBadRequest)
+		case clamd.RES_PARSE_ERROR:
+			w.WriteHeader(http.StatusPreconditionFailed)
+		default:
+			w.WriteHeader(http.StatusNotImplemented)
+		}
+
+		fmt.Fprint(w, string(respJson))
+		fmt.Printf(time.Now().Format(time.RFC3339)+" Scan result for: %v, %v\n", part.FileName(), s)
 		fmt.Printf(time.Now().Format(time.RFC3339) + " Finished scanning: " + part.FileName() + "\n")
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
