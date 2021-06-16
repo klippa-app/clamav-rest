@@ -143,7 +143,7 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		fmt.Fprint(w, string(respJson))
-		fmt.Printf(time.Now().Format(time.RFC3339)+" Scan result for: %v, %v\n", part.FileName(), s)
+		fmt.Printf(time.Now().Format(time.RFC3339)+" Scan result for: %v, %v\n", part.FileName(), string(respJson))
 		fmt.Printf(time.Now().Format(time.RFC3339) + " Finished scanning: " + part.FileName() + "\n")
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
