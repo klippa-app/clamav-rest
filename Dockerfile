@@ -3,9 +3,6 @@ FROM golang:alpine
 # Update
 RUN apk update upgrade;
 
-# Install git
-RUN apk add git
-
 # Set timezone to Europe/Zurich
 RUN apk add tzdata
 RUN ln -s /usr/share/zoneinfo/Europe/Zurich /etc/localtime
