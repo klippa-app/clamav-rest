@@ -119,7 +119,7 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		s := <-response
-		defer close(response)
+		//defer close(response)
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
