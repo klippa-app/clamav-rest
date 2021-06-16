@@ -15,7 +15,7 @@ RUN apk --no-cache add clamav clamav-libunrar \
     && mkdir /run/clamav \
     && chown clamav:clamav /run/clamav
 
-# Configure clamAV to run in foreground with port 3310
+# Configure ClamAV to run in foreground with port 3310
 RUN sed -i 's/^#Foreground .*$/Foreground true/g' /etc/clamav/clamd.conf \
     && sed -i 's/^#TCPSocket .*$/TCPSocket 3310/g' /etc/clamav/clamd.conf \
     && sed -i 's/^#Foreground .*$/Foreground true/g' /etc/clamav/freshclam.conf
@@ -24,10 +24,8 @@ RUN freshclam --quiet --no-dns
 
 # Build go package
 ADD . /go/src/clamav-rest/
-RUN go get github.com/dutchcoders/go-clamd
-RUN go get github.com/prometheus/client_golang/prometheus/promhttp
 ADD ./server.* /etc/ssl/clamav-rest/
-RUN cd /go/src/clamav-rest && go build -v
+RUN cd /go/src/clamav-rest && go mod vendor && go build -v
 
 COPY entrypoint.sh /usr/bin/
 RUN mv /go/src/clamav-rest/clamav-rest /usr/bin/ && rm -Rf /go/src/clamav-rest
