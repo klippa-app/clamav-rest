@@ -105,7 +105,6 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		//if part.FileName() is empty, skip this iteration.
 		if part.FileName() == "" {
 			writeError(w, http.StatusBadRequest, "Filename is empty")
 			return
