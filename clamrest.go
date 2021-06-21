@@ -109,11 +109,6 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if part.FileName() == "" {
-			writeError(w, http.StatusBadRequest, "Filename is empty")
-			return
-		}
-
 		fmt.Printf(time.Now().Format(time.RFC3339) + " Started scanning: " + part.FileName() + "\n")
 		var abort chan bool
 		response, err := c.ScanStream(part, abort)
