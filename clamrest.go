@@ -25,6 +25,8 @@ type Error struct {
 }
 
 func writeError(w http.ResponseWriter, statusCode int, err string) {
+	log.Printf(time.Now().Format(time.RFC3339) + "ERROR: " + err)
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(statusCode)
 
@@ -90,6 +92,8 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	//POST takes the uploaded file(s) and saves it to disk.
 	case "POST":
+		log.Printf(time.Now().Format(time.RFC3339) + "Received scan request " + r.RequestURI)
+
 		c := clamd.NewClamd(opts["CLAMD_PORT"])
 		//get the multipart reader for the request.
 		reader, err := r.MultipartReader()
