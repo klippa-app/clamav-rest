@@ -25,6 +25,8 @@ type Error struct {
 }
 
 func writeError(w http.ResponseWriter, statusCode int, err string) {
+	log.Printf(time.Now().Format(time.RFC3339) + "ERROR: " + err)
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(statusCode)
 
@@ -90,6 +92,8 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	//POST takes the uploaded file(s) and saves it to disk.
 	case "POST":
+		log.Printf(time.Now().Format(time.RFC3339) + "Received scan request " + r.RequestURI)
+
 		c := clamd.NewClamd(opts["CLAMD_PORT"])
 		//get the multipart reader for the request.
 		reader, err := r.MultipartReader()
@@ -105,12 +109,6 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		//if part.FileName() is empty, skip this iteration.
-		if part.FileName() == "" {
-			writeError(w, http.StatusBadRequest, "Filename is empty")
-			return
-		}
-
 		fmt.Printf(time.Now().Format(time.RFC3339) + " Started scanning: " + part.FileName() + "\n")
 		var abort chan bool
 		response, err := c.ScanStream(part, abort)
@@ -120,6 +118,7 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		s := <-response
+		//defer close(response)
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
@@ -143,7 +142,7 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		fmt.Fprint(w, string(respJson))
-		fmt.Printf(time.Now().Format(time.RFC3339)+" Scan result for: %v, %v\n", part.FileName(), s)
+		fmt.Printf(time.Now().Format(time.RFC3339)+" Scan result for: %v, %v\n", part.FileName(), string(respJson))
 		fmt.Printf(time.Now().Format(time.RFC3339) + " Finished scanning: " + part.FileName() + "\n")
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
